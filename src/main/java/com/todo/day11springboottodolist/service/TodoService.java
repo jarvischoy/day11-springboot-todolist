@@ -22,4 +22,16 @@ public class TodoService {
     public Todo create(Todo todo) {
         return todoRepository.save(todo);
     }
+
+    public Todo update(Integer id, Todo todo) {
+        Todo todoToUpdate = todoRepository.findById(id).orElse(null);
+        if (todoToUpdate == null) {
+            return null;
+        }
+        return todoRepository.save(todo);
+    }
+
+    public void delete(Integer id) {
+        todoRepository.deleteById(id);
+    }
 }
