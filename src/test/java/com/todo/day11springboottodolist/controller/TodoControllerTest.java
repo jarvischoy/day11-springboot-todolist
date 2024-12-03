@@ -2,6 +2,7 @@ package com.todo.day11springboottodolist.controller;
 
 import com.todo.day11springboottodolist.model.Todo;
 import com.todo.day11springboottodolist.repository.TodoRepository;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -118,5 +119,21 @@ class TodoControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
 
         assertThat(todoRepository.findById(todo.getId())).isEmpty();
+    }
+
+    @Test
+    void should_throw_exception_when_update_todo_given_todo_id_not_found() throws Exception {
+        //given
+        final Todo notFoundTodo = new Todo(999, "Task 999", false);
+        final int notFoundTodoId = notFoundTodo.getId();
+
+        //when
+        //then
+        String contentAsString = client.perform(MockMvcRequestBuilders.put("/todos/" + notFoundTodoId)
+                .contentType("application/json")
+                .content(todoJacksonTester.write(notFoundTodo).getJson()))
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andReturn().getResponse().getContentAsString();
+        AssertionsForClassTypes.assertThat(contentAsString).isEqualTo("Todo with the following id not found:" + notFoundTodoId);
     }
 }
